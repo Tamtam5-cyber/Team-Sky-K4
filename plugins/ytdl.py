@@ -1,15 +1,15 @@
 # ---------------------------------------------------
-# File Name: ytdl.py (pure code)
-# Description: A Pyrogram bot for downloading yt and other sites videos from Telegram channels or groups 
-#              and uploading them back to Telegram.
-# Author: Gagan
+# Tên File: ytdl.py (mã thuần)
+# Mô tả: Một bot Pyrogram để tải video từ YouTube và các trang web khác từ các kênh hoặc nhóm Telegram
+#        và tải lại chúng lên Telegram.
+# Tác giả: Gagan
 # GitHub: https://github.com/devgaganin/
-# Telegram: https://t.me/team_spy_pro
+# Telegram: https://t.me/ultimatesmmnews
 # YouTube: https://youtube.com/@dev_gagan
-# Created: 2025-01-11
-# Last Modified: 2025-01-11
-# Version: 2.0.5
-# License: MIT License
+# Ngày tạo: 2025-01-11
+# Lần sửa cuối: 2025-01-11
+# Phiên bản: 2.0.5
+# Giấy phép: Giấy phép MIT
 # ---------------------------------------------------
 
 import yt_dlp
@@ -42,9 +42,10 @@ logger = logging.getLogger(__name__)
  
  
 thread_pool = ThreadPoolExecutor()
-ongoing_downloads = {}
+ongoing_downloads = {}  # Từ điển lưu trữ các lượt tải đang diễn ra
  
 def d_thumbnail(thumbnail_url, save_path):
+    """Tải hình ảnh thu nhỏ từ URL và lưu vào đường dẫn được chỉ định."""
     try:
         response = requests.get(thumbnail_url, stream=True)
         response.raise_for_status()
@@ -53,11 +54,12 @@ def d_thumbnail(thumbnail_url, save_path):
                 f.write(chunk)
         return save_path
     except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to download thumbnail: {e}")
+        logger.error(f"Không thể tải hình ảnh thu nhỏ: {e}")
         return None
  
  
 async def download_thumbnail_async(url, path):
+    """Tải hình ảnh thu nhỏ bất đồng bộ."""
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status == 200:
@@ -66,6 +68,7 @@ async def download_thumbnail_async(url, path):
  
  
 async def extract_audio_async(ydl_opts, url):
+    """Trích xuất âm thanh từ URL bất đồng bộ."""
     def sync_extract():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             return ydl.extract_info(url, download=True)
@@ -73,11 +76,13 @@ async def extract_audio_async(ydl_opts, url):
  
  
 def get_random_string(length=7):
+    """Tạo chuỗi ngẫu nhiên với độ dài được chỉ định."""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(length)) 
  
  
 async def process_audio(client, event, url, cookies_env_var=None):
+    """Xử lý và tải âm thanh từ URL."""
     cookies = None
     if cookies_env_var:
         cookies = cookies_env_var
@@ -89,27 +94,27 @@ async def process_audio(client, event, url, cookies_env_var=None):
             temp_cookie_path = temp_cookie_file.name
  
     start_time = time.time()
-    random_filename = f"@ultimatesmmnews_{event.sender_id}"
+    random_filename = f"@ultimatesmmnews__{event.sender_id}"
     download_path = f"{random_filename}.mp3"
  
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': f"{random_filename}.%(ext)s",
-        'cookiefile': temp_cookie_path,
-        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],
+        'format': 'bestaudio/best',  # Chọn định dạng âm thanh tốt nhất
+        'outtmpl': f"{random_filename}.%(ext)s",  # Tên file đầu ra
+        'cookiefile': temp_cookie_path,  # File cookie tạm thời
+        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'}],  # Chuyển đổi sang mp3
         'quiet': False,
-        'noplaylist': True,
+        'noplaylist': True,  # Không tải danh sách phát
     }
     prog = None
  
-    progress_message = await event.reply("**__Starting audio extraction...__**")
+    progress_message = await event.reply("**__Đang bắt đầu trích xuất âm thanh...__**")
  
     try:
          
         info_dict = await extract_audio_async(ydl_opts, url)
-        title = info_dict.get('title', 'Extracted Audio')
+        title = info_dict.get('title', 'Âm thanh đã trích xuất')
  
-        await progress_message.edit("**__Editing metadata...__**")
+        await progress_message.edit("**__Đang chỉnh sửa siêu dữ liệu...__**")
  
          
         if os.path.exists(download_path):
@@ -119,9 +124,9 @@ async def process_audio(client, event, url, cookies_env_var=None):
                     audio_file.add_tags()
                 except Exception:
                     pass
-                audio_file.tags["TIT2"] = TIT2(encoding=3, text=title)
-                audio_file.tags["TPE1"] = TPE1(encoding=3, text="Team SPY")
-                audio_file.tags["COMM"] = COMM(encoding=3, lang="eng", desc="Comment", text="Hỗ Trợ Bởi TEAM SKY")
+                audio_file.tags["TIT2"] = TIT2(encoding=3, text=title)  # Tiêu đề bài hát
+                audio_file.tags["TPE1"] = TPE1(encoding=3, text="TEAM Name_Apex")  # Tên nghệ sĩ
+                audio_file.tags["COMM"] = COMM(encoding=3, lang="eng", desc="Bình luận", text="Hỗ trợ bởi TEAM Name_Apex")  # Bình luận
  
                 thumbnail_url = info_dict.get('thumbnail')
                 if thumbnail_url:
@@ -129,8 +134,8 @@ async def process_audio(client, event, url, cookies_env_var=None):
                     asyncio.run(download_thumbnail_async(thumbnail_url, thumbnail_path))
                     with open(thumbnail_path, 'rb') as img:
                         audio_file.tags["APIC"] = APIC(
-                            encoding=3, mime='image/jpeg', type=3, desc='Cover', data=img.read()
-                        )
+                            encoding=3, mime='image/jpeg', type=3, desc='Bìa', data=img.read()
+                        )  # Hình ảnh bìa
                     os.remove(thumbnail_path)
                 audio_file.save()
  
@@ -142,22 +147,22 @@ async def process_audio(client, event, url, cookies_env_var=None):
         chat_id = event.chat_id
         if os.path.exists(download_path):
             await progress_message.delete()
-            prog = await client.send_message(chat_id, "**__Starting Upload...__**")
+            prog = await client.send_message(chat_id, "**__Đang bắt đầu tải lên...__**")
             uploaded = await fast_upload(
                 client, download_path, 
                 reply=prog, 
                 name=None,
                 progress_bar_function=lambda done, total: progress_callback(done, total, chat_id)
             )
-            await client.send_file(chat_id, uploaded, caption=f"**{title}**\n\n**__Powered by Team SPY__**")
+            await client.send_file(chat_id, uploaded, caption=f"**{title}**\n\n**__Hỗ trợ bởi TEAM Name_Apex__**")
             if prog:
                 await prog.delete()
         else:
-            await event.reply("**__Audio file not found after extraction!__**")
+            await event.reply("**__Không tìm thấy file âm thanh sau khi trích xuất!__**")
  
     except Exception as e:
-        logger.exception("Error during audio extraction or upload")
-        await event.reply(f"**__An error occurred: {e}__**")
+        logger.exception("Lỗi trong quá trình trích xuất hoặc tải lên âm thanh")
+        await event.reply(f"**__Đã xảy ra lỗi: {e}__**")
     finally:
         if os.path.exists(download_path):
             os.remove(download_path)
@@ -166,13 +171,14 @@ async def process_audio(client, event, url, cookies_env_var=None):
  
 @client.on(events.NewMessage(pattern="/adl"))
 async def handler(event):
+    """Xử lý lệnh /adl để tải âm thanh."""
     user_id = event.sender_id
     if user_id in ongoing_downloads:
-        await event.reply("**You already have an ongoing download. Please wait until it completes!**")
+        await event.reply("**Bạn đang có một lượt tải đang diễn ra. Vui lòng đợi cho đến khi hoàn tất!**")
         return
  
     if len(event.message.text.split()) < 2:
-        await event.reply("**Usage:** `/adl <video-link>`\n\nPlease provide a valid video link!")
+        await event.reply("**Cách dùng:** `/adl <liên-kết-video>`\n\nVui lòng cung cấp một liên kết video hợp lệ!")
         return    
  
     url = event.message.text.split()[1]
@@ -180,18 +186,19 @@ async def handler(event):
  
     try:
         if "instagram.com" in url:
-            await process_audio(client, event, url, cookies_env_var="INSTA_COOKIES")
+            await process_audio(client, event, url, cookies_env_var=INSTA_COOKIES)
         elif "youtube.com" in url or "youtu.be" in url:
-            await process_audio(client, event, url, cookies_env_var="YT_COOKIES")
+            await process_audio(client, event, url, cookies_env_var=YT_COOKIES)
         else:
             await process_audio(client, event, url)
     except Exception as e:
-        await event.reply(f"**An error occurred:** `{e}`")
+        await event.reply(f"**Đã xảy ra lỗi:** `{e}`")
     finally:
         ongoing_downloads.pop(user_id, None)
  
  
 async def fetch_video_info(url, ydl_opts, progress_message, check_duration_and_size):
+    """Lấy thông tin video từ URL."""
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=False)
  
@@ -199,33 +206,35 @@ async def fetch_video_info(url, ydl_opts, progress_message, check_duration_and_s
              
             duration = info_dict.get('duration', 0)
             if duration and duration > 3 * 3600:   
-                await progress_message.edit("**❌ __Video is longer than 3 hours. Download aborted...__**")
+                await progress_message.edit("**❌ __Video dài hơn 3 giờ. Hủy tải xuống...__**")
                 return None
  
              
             estimated_size = info_dict.get('filesize_approx', 0)
             if estimated_size and estimated_size > 2 * 1024 * 1024 * 1024:   
-                await progress_message.edit("**🤞 __Video size is larger than 2GB. Aborting download.__**")
+                await progress_message.edit("**🤞 __Kích thước video lớn hơn 2GB. Hủy tải xuống.__**")
                 return None
  
         return info_dict
  
 def download_video(url, ydl_opts):
+    """Tải video từ URL."""
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
  
  
 @client.on(events.NewMessage(pattern="/dl"))
 async def handler(event):
+    """Xử lý lệnh /dl để tải video."""
     user_id = event.sender_id
  
      
     if user_id in ongoing_downloads:
-        await event.reply("**You already have an ongoing ytdlp download. Please wait until it completes!**")
+        await event.reply("**Bạn đang có một lượt tải ytdlp đang diễn ra. Vui lòng đợi cho đến khi hoàn tất!**")
         return
  
     if len(event.message.text.split()) < 2:
-        await event.reply("**Usage:** `/dl <video-link>`\n\nPlease provide a valid video link!")
+        await event.reply("**Cách dùng:** `/dl <liên-kết-video>`\n\nVui lòng cung cấp một liên kết video hợp lệ!")
         return    
  
     url = event.message.text.split()[1]
@@ -233,14 +242,14 @@ async def handler(event):
      
     try:
         if "instagram.com" in url:
-            await process_video(client, event, url, "INSTA_COOKIES", check_duration_and_size=False)
+            await process_video(client, event, url, INSTA_COOKIES, check_duration_and_size=False)
         elif "youtube.com" in url or "youtu.be" in url:
-            await process_video(client, event, url, "YT_COOKIES", check_duration_and_size=True)
+            await process_video(client, event, url, YT_COOKIES, check_duration_and_size=True)
         else:
             await process_video(client, event, url, None, check_duration_and_size=False)
  
     except Exception as e:
-        await event.reply(f"**An error occurred:** `{e}`")
+        await event.reply(f"**Đã xảy ra lỗi:** `{e}`")
     finally:
          
         ongoing_downloads.pop(user_id, None)
@@ -251,6 +260,7 @@ async def handler(event):
 user_progress = {}
  
 def progress_callback(done, total, user_id):
+    """Cập nhật thanh tiến trình cho quá trình tải lên."""
      
     if user_id not in user_progress:
         user_progress[user_id] = {
@@ -295,15 +305,15 @@ def progress_callback(done, total, user_id):
      
     final = (
         f"╭──────────────────╮\n"
-        f"│        **__Uploading...__**       \n"
+        f"│        **__Đang tải lên...__**       \n"
         f"├──────────\n"
         f"│ {progress_bar}\n\n"
-        f"│ **__Progress:__** {percent:.2f}%\n"
-        f"│ **__Done:__** {done_mb:.2f} MB / {total_mb:.2f} MB\n"
-        f"│ **__Speed:__** {speed_mbps:.2f} Mbps\n"
-        f"│ **__Time Remaining:__** {remaining_time_min:.2f} min\n"
+        f"│ **__Tiến độ:__** {percent:.2f}%\n"
+        f"│ **__Đã tải:__** {done_mb:.2f} MB / {total_mb:.2f} MB\n"
+        f"│ **__Tốc độ:__** {speed_mbps:.2f} Mbps\n"
+        f"│ **__Thời gian còn lại:__** {remaining_time_min:.2f} phút\n"
         f"╰──────────────────╯\n\n"
-        f"**__Powered by Team SPY__**"
+        f"**__Hỗ trợ bởi TEAM Name_Apex__**"
     )
  
      
@@ -313,8 +323,9 @@ def progress_callback(done, total, user_id):
     return final
  
 async def process_video(client, event, url, cookies_env_var, check_duration_and_size=False):
+    """Xử lý và tải video từ URL."""
     start_time = time.time()
-    logger.info(f"Received link: {url}")
+    logger.info(f"Nhận được liên kết: {url}")
      
     cookies = None
     if cookies_env_var:
@@ -323,7 +334,7 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
      
     random_filename = get_random_string() + ".mp4"
     download_path = os.path.abspath(random_filename)
-    logger.info(f"Generated random download path: {download_path}")
+    logger.info(f"Đã tạo đường dẫn tải xuống ngẫu nhiên: {download_path}")
  
      
     temp_cookie_path = None
@@ -331,7 +342,7 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
         with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.txt') as temp_cookie_file:
             temp_cookie_file.write(cookies)
             temp_cookie_path = temp_cookie_file.name
-        logger.info(f"Created temporary cookie file at: {temp_cookie_path}")
+        logger.info(f"Đã tạo file cookie tạm thời tại: {temp_cookie_path}")
  
      
     thumbnail_file = None
@@ -340,21 +351,21 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
      
     ydl_opts = {
         'outtmpl': download_path,
-        'format': 'best',
+        'format': 'best',  # Chọn định dạng video tốt nhất
         'cookiefile': temp_cookie_path if temp_cookie_path else None,
-        'writethumbnail': True,
+        'writethumbnail': True,  # Lưu hình ảnh thu nhỏ
         'verbose': True,
     }
     prog = None
-    progress_message = await event.reply("**__Starting download...__**")
-    logger.info("Starting the download process...")
+    progress_message = await event.reply("**__Đang bắt đầu tải xuống...__**")
+    logger.info("Bắt đầu quá trình tải xuống...")
     try:
         info_dict = await fetch_video_info(url, ydl_opts, progress_message, check_duration_and_size)
         if not info_dict:
             return
          
         await asyncio.to_thread(download_video, url, ydl_opts)
-        title = info_dict.get('title', 'Powered by Team SPY')
+        title = info_dict.get('title', 'Hỗ trợ bởi TEAM Name_Apex')
         k = await get_video_metadata(download_path)      
         W = k['width']
         H = k['height']
@@ -370,7 +381,7 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
             thumbnail_file = os.path.join(tempfile.gettempdir(), get_random_string() + ".jpg")
             downloaded_thumb = d_thumbnail(thumbnail_url, thumbnail_file)
             if downloaded_thumb:
-                logger.info(f"Thumbnail saved at: {downloaded_thumb}")
+                logger.info(f"Hình ảnh thu nhỏ đã được lưu tại: {downloaded_thumb}")
  
         if thumbnail_file:
             THUMB = thumbnail_file
@@ -382,13 +393,13 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
         caption = f"{title}"
      
         if os.path.exists(download_path) and os.path.getsize(download_path) > SIZE:
-            prog = await client.send_message(chat_id, "**__Starting Upload...__**")
+            prog = await client.send_message(chat_id, "**__Đang bắt đầu tải lên...__**")
             await split_and_upload_file(app, chat_id, download_path, caption)
             await prog.delete()
          
         if os.path.exists(download_path):
             await progress_message.delete()
-            prog = await client.send_message(chat_id, "**__Starting Upload...__**")
+            prog = await client.send_message(chat_id, "**__Đang bắt đầu tải lên...__**")
             uploaded = await fast_upload(
                 client, download_path,
                 reply=prog,
@@ -411,10 +422,10 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
             if prog:
                 await prog.delete()
         else:
-            await event.reply("**__File not found after download. Something went wrong!__**")
+            await event.reply("**__Không tìm thấy file sau khi tải xuống. Có lỗi xảy ra!__**")
     except Exception as e:
-        logger.exception("An error occurred during download or upload.")
-        await event.reply(f"**__An error occurred: {e}__**")
+        logger.exception("Đã xảy ra lỗi trong quá trình tải xuống hoặc tải lên.")
+        await event.reply(f"**__Đã xảy ra lỗi: {e}__**")
     finally:
          
         if os.path.exists(download_path):
@@ -426,13 +437,14 @@ async def process_video(client, event, url, cookies_env_var, check_duration_and_
  
 
 async def split_and_upload_file(app, sender, file_path, caption):
+    """Chia nhỏ và tải lên file lớn."""
     if not os.path.exists(file_path):
-        await app.send_message(sender, "❌ File not found!")
+        await app.send_message(sender, "❌ Không tìm thấy file!")
         return
 
     file_size = os.path.getsize(file_path)
-    start = await app.send_message(sender, f"ℹ️ File size: {file_size / (1024 * 1024):.2f} MB")
-    PART_SIZE =  1.9 * 1024 * 1024 * 1024
+    start = await app.send_message(sender, f"ℹ️ Kích thước file: {file_size / (1024 * 1024):.2f} MB")
+    PART_SIZE =  1.9 * 1024 * 1024 * 1024  # Kích thước mỗi phần
 
     part_number = 0
     async with aiofiles.open(file_path, mode="rb") as f:
@@ -441,20 +453,20 @@ async def split_and_upload_file(app, sender, file_path, caption):
             if not chunk:
                 break
 
-            # Create part filename
+            # Tạo tên file cho phần
             base_name, file_ext = os.path.splitext(file_path)
             part_file = f"{base_name}.part{str(part_number).zfill(3)}{file_ext}"
 
-            # Write part to file
+            # Ghi phần vào file
             async with aiofiles.open(part_file, mode="wb") as part_f:
                 await part_f.write(chunk)
 
-            # Uploading part
-            edit = await app.send_message(sender, f"⬆️ Uploading part {part_number + 1}...")
-            part_caption = f"{caption} \n\n**Part : {part_number + 1}**"
+            # Tải lên phần
+            edit = await app.send_message(sender, f"⬆️ Đang tải lên phần {part_number + 1}...")
+            part_caption = f"{caption} \n\n**Phần: {part_number + 1}**"
             await app.send_document(sender, document=part_file, caption=part_caption,
                 progress=progress_bar,
-                progress_args=("╭─────────────────────╮\n│      **__Pyro Uploader__**\n├─────────────────────", edit, time.time())
+                progress_args=("╭─────────────────────╮\n│      **__Tải lên bởi Pyro__**\n├─────────────────────", edit, time.time())
             )
             await edit.delete()
             os.remove(part_file)
@@ -466,16 +478,16 @@ async def split_and_upload_file(app, sender, file_path, caption):
 
 
 PROGRESS_BAR = """
-│ **__Completed:__** {1}/{2}
-│ **__Bytes:__** {0}%
-│ **__Speed:__** {3}/s
-│ **__ETA:__** {4}
+│ **__Hoàn tất:__** {1}/{2}
+│ **__Byte:__** {0}%
+│ **__Tốc độ:__** {3}/s
+│ **__Thời gian còn lại:__** {4}
 ╰─────────────────────╯
 """
 
 async def get_seconds(time_string: str) -> int:
     """
-    Converts a time string (e.g., '5min', '2hour') into seconds.
+    Chuyển đổi chuỗi thời gian (ví dụ: '5min', '2hour') thành giây.
     """
     def extract_value_and_unit(ts: str):
         value = ''.join(filter(str.isdigit, ts))
@@ -496,7 +508,7 @@ async def get_seconds(time_string: str) -> int:
 
 async def progress_bar(current: int, total: int, ud_type: str, message, start: float):
     """
-    Updates the progress bar for an ongoing process.
+    Cập nhật thanh tiến trình cho quá trình đang diễn ra.
     """
     now = time.time()
     diff = now - start
@@ -528,7 +540,7 @@ async def progress_bar(current: int, total: int, ud_type: str, message, start: f
 
 def humanbytes(size: int) -> str:
     """
-    Converts bytes into a human-readable format.
+    Chuyển đổi byte thành định dạng dễ đọc cho con người.
     """
     if not size:
         return ""
@@ -544,7 +556,7 @@ def humanbytes(size: int) -> str:
 
 def TimeFormatter(milliseconds: int) -> str:
     """
-    Formats milliseconds into a human-readable duration.
+    Định dạng mili giây thành khoảng thời gian dễ đọc.
     """
     seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
@@ -552,17 +564,17 @@ def TimeFormatter(milliseconds: int) -> str:
     days, hours = divmod(hours, 24)
     
     parts = []
-    if days: parts.append(f"{days}d")
-    if hours: parts.append(f"{hours}h")
-    if minutes: parts.append(f"{minutes}m")
-    if seconds: parts.append(f"{seconds}s")
-    if milliseconds: parts.append(f"{milliseconds}ms")
+    if days: parts.append(f"{days} ngày")
+    if hours: parts.append(f"{hours} giờ")
+    if minutes: parts.append(f"{minutes} phút")
+    if seconds: parts.append(f"{seconds} giây")
+    if milliseconds: parts.append(f"{milliseconds} mili giây")
     
     return ', '.join(parts)
 
 def convert(seconds: int) -> str:
     """
-    Converts seconds into HH:MM:SS format.
+    Chuyển đổi giây thành định dạng HH:MM:SS.
     """
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
