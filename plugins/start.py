@@ -13,108 +13,104 @@ async def subscribe(app, message):
         try:
           user = await app.get_chat_member(FORCE_SUB, message.from_user.id)
           if str(user.status) == "ChatMemberStatus.BANNED":
-              await message.reply_text("You are Banned. Contact -- Team SPY")
+              await message.reply_text("Bạn đã bị chặn. Vui lòng liên hệ Team SKY")
               return 1
         except UserNotParticipant:
             link = await app.export_chat_invite_link(FORCE_SUB)
-            caption = f"Join our channel to use the bot"
-            await message.reply_photo(photo="https://graph.org/file/d44f024a08ded19452152.jpg",caption=caption, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Now...", url=f"{link}")]]))
+            caption = f"Vui lòng tham gia kênh của chúng tôi để sử dụng bot."
+            await message.reply_photo(photo="https://graph.org/file/d44f024a08ded19452152.jpg",caption=caption, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Tham gia ngay...", url=f"{link}")]]))
             return 1
         except Exception as ggn:
-            await message.reply_text(f"Something Went Wrong. Contact admins... with following message {ggn}")
+            await message.reply_text(f"Đã xảy ra lỗi. Vui lòng liên hệ quản trị viên !!!{ggn}")
             return 1 
      
 @app.on_message(filters.command("set"))
 async def set(_, message):
     if message.from_user.id not in OWNER_ID:
-        await message.reply("You are not authorized to use this command.")
+        await message.reply("Bạn không có quyền sử dụng lệnh này.")
         return
      
     await app.set_bot_commands([
-        BotCommand("start", "🚀 Start the bot"),
-        BotCommand("batch", "🫠 Extract in bulk"),
-        BotCommand("login", "🔑 Get into the bot"),
-        BotCommand("setbot", "🧸 Add your bot for handling files"),
-        BotCommand("logout", "🚪 Get out of the bot"),
-        BotCommand("adl", "👻 Download audio from 30+ sites"),
-        BotCommand("dl", "💀 Download videos from 30+ sites"),
-        BotCommand("status", "⟳ Refresh Payment status"),
-        BotCommand("transfer", "💘 Gift premium to others"),
-        BotCommand("add", "➕ Add user to premium"),
-        BotCommand("rem", "➖ Remove from premium"),
-        BotCommand("rembot", "🤨 Remove your custom bot"),
-        BotCommand("settings", "⚙️ Personalize things"),
-        BotCommand("plan", "🗓️ Check our premium plans"),
-        BotCommand("terms", "🥺 Terms and conditions"),
-        BotCommand("help", "❓ If you're a noob, still!"),
-        BotCommand("cancel", "🚫 Cancel login/batch/settings process"),
-        BotCommand("stop", "🚫 Cancel batch process")
-    ])
+        BotCommand("start", "🚀 Khởi động bot"),
+        BotCommand("batch", "🫠 Trích xuất hàng loạt"),
+        BotCommand("login", "🔑 Đăng nhập bot"),
+        BotCommand("setbot", "🧸 Thêm bot để xử lý tệp"),
+        BotCommand("logout", "🚪 Đăng xuất khỏi bot"),
+        BotCommand("adl", "👻 Tải xuống âm thanh từ 30+ trang web"),
+        BotCommand("dl", "💀 Tải video từ 30+ trang web"),
+        BotCommand("status", "⟳ Làm mới trạng thái "),
+        BotCommand("transfer", "💘 Tặng gói cao cấp cho người khác"),
+        BotCommand("add", "➕ Thêm người dùng vào gói cao cấp"),
+        BotCommand("rem", "➖ Xóa khỏi gói cao cấp"),
+        BotCommand("rembot", "🤨 Xóa bot tùy chỉnh của bạn"),
+        BotCommand("settings", "⚙️ Cài đặt bot"),
+        BotCommand("plan", "🗓️ Xem thông tin gói"),
+        BotCommand("terms", "🥺 Điều khoản và điều kiện"),
+        BotCommand("help", "❓ Hướng dẫn sử dụng"),
+        BotCommand("cancel", "🚫 Hủy quá trình đăng nhập/batch/cài đặt"),
+        BotCommand("stop", "🚫 Hủy quá trình batch")
  
-    await message.reply("✅ Commands configured successfully!")
+    await message.reply("✅ Cài Đặt Lệnh Thành Công!")
  
- 
- 
- 
-help_pages = [
+# Danh sách trang hướng dẫn sử dụng bot
     (
-        "📝 **Bot Commands Overview (1/2)**:\n\n"
+        "📝 **Tổng quan lệnh bot (1/2)**:\n\n"
         "1. **/add userID**\n"
-        "> Add user to premium (Owner only)\n\n"
+        "> Thêm người dùng vào premium (chỉ chủ sở hữu)\n\n"
         "2. **/rem userID**\n"
-        "> Remove user from premium (Owner only)\n\n"
+        "> Xóa người dùng khỏi premium (chỉ chủ sở hữu)\n\n"
         "3. **/transfer userID**\n"
-        "> Transfer premium to your beloved major purpose for resellers (Premium members only)\n\n"
+        "> Chuyển premium cho người khác (chỉ premium)\n\n"
         "4. **/get**\n"
-        "> Get all user IDs (Owner only)\n\n"
+        "> Lấy danh sách ID người dùng (chỉ chủ sở hữu)\n\n"
         "5. **/lock**\n"
-        "> Lock channel from extraction (Owner only)\n\n"
+        "> Khóa kênh không cho trích xuất (chỉ chủ sở hữu)\n\n"
         "6. **/dl link**\n"
-        "> Download videos (Not available in v3 if you are using)\n\n"
+        "> Tải video (không khả dụng ở v3)\n\n"
         "7. **/adl link**\n"
-        "> Download audio (Not available in v3 if you are using)\n\n"
+        "> Tải âm thanh (không khả dụng ở v3)\n\n"
         "8. **/login**\n"
-        "> Log into the bot for private channel access\n\n"
+        "> Đăng nhập để truy cập kênh riêng tư\n\n"
         "9. **/batch**\n"
-        "> Bulk extraction for posts (After login)\n\n"
+        "> Trích xuất hàng loạt (sau khi đăng nhập)\n\n"
     ),
     (
-        "📝 **Bot Commands Overview (2/2)**:\n\n"
+        "📝 **Tổng quan lệnh bot (2/2)**:\n\n"
         "10. **/logout**\n"
-        "> Logout from the bot\n\n"
+        "> Đăng xuất khỏi bot\n\n"
         "11. **/stats**\n"
-        "> Get bot stats\n\n"
+        "> Thống kê hoạt động bot\n\n"
         "12. **/plan**\n"
-        "> Check premium plans\n\n"
+        "> Kiểm tra gói premium\n\n"
         "13. **/speedtest**\n"
-        "> Test the server speed (not available in v3)\n\n"
+        "> Kiểm tra tốc độ máy chủ (không khả dụng ở v3)\n\n"
         "14. **/terms**\n"
-        "> Terms and conditions\n\n"
+        "> Điều khoản và điều kiện\n\n"
         "15. **/cancel**\n"
-        "> Cancel ongoing batch process\n\n"
+        "> Hủy tiến trình đang chạy\n\n"
         "16. **/myplan**\n"
-        "> Get details about your plans\n\n"
+        "> Xem chi tiết gói của bạn\n\n"
         "17. **/session**\n"
-        "> Generate Pyrogram V2 session\n\n"
+        "> Tạo phiên Pyrogram V2\n\n"
         "18. **/settings**\n"
-        "> 1. SETCHATID : To directly upload in channel or group or user's dm use it with -100[chatID]\n"
-        "> 2. SETRENAME : To add custom rename tag or username of your channels\n"
-        "> 3. CAPTION : To add custom caption\n"
-        "> 4. REPLACEWORDS : Can be used for words in deleted set via REMOVE WORDS\n"
-        "> 5. RESET : To set the things back to default\n\n"
-        "> You can set CUSTOM THUMBNAIL, PDF WATERMARK, VIDEO WATERMARK, SESSION-based login, etc. from settings\n\n"
-        "**__Powered by Team SPY__**"
+        "> 1. SETCHATID: Đăng tải trực tiếp vào kênh, nhóm hoặc DM người dùng (dùng -100[chatID])\n"
+        "> 2. SETRENAME: Thêm tag tùy chỉnh hoặc tên kênh\n"
+        "> 3. CAPTION: Thêm chú thích tùy chỉnh\n"
+        "> 4. REPLACEWORDS: Thay thế từ khóa đã bị xóa\n"
+        "> 5. RESET: Đặt lại tất cả về mặc định\n\n"
+        "> Bạn có thể thiết lập ảnh đại diện, watermark PDF/video, đăng nhập bằng session, v.v. trong mục settings\n\n"
+        "**__Tài Trợ Bởi TEAM SKY__**"
     )
 ]
  
- 
+ # Hàm gửi nội dung trợ giúp hoặc chuyển trang trợ giúp
 async def send_or_edit_help_page(_, message, page_number):
     if page_number < 0 or page_number >= len(help_pages):
         return
  
      
-    prev_button = InlineKeyboardButton("◀️ Previous", callback_data=f"help_prev_{page_number}")
-    next_button = InlineKeyboardButton("Next ▶️", callback_data=f"help_next_{page_number}")
+    prev_button = InlineKeyboardButton("◀️ Quay lại", callback_data=f"help_prev_{page_number}")
+    next_button = InlineKeyboardButton("Tiếp theo ▶️", callback_data=f"help_next_{page_number}")
  
      
     buttons = []
@@ -161,17 +157,17 @@ async def on_help_navigation(client, callback_query):
  
 @app.on_message(filters.command("terms") & filters.private)
 async def terms(client, message):
-    terms_text = (
-        "> 📜 **Terms and Conditions** 📜\n\n"
-        "✨ We are not responsible for user deeds, and we do not promote copyrighted content. If any user engages in such activities, it is solely their responsibility.\n"
-        "✨ Upon purchase, we do not guarantee the uptime, downtime, or the validity of the plan. __Authorization and banning of users are at our discretion; we reserve the right to ban or authorize users at any time.__\n"
-        "✨ Payment to us **__does not guarantee__** authorization for the /batch command. All decisions regarding authorization are made at our discretion and mood.\n"
+     terms_text = (
+        "> 📜 **Điều khoản và điều kiện** 📜\n\n"
+        "✨ Chúng tôi không chịu trách nhiệm cho hành vi người dùng và không khuyến khích nội dung vi phạm bản quyền. Người dùng chịu trách nhiệm hoàn toàn.\n"
+        "✨ Khi mua, chúng tôi không đảm bảo thời gian hoạt động hoặc hiệu lực gói. __Việc cấp quyền hay chặn người dùng hoàn toàn do chúng tôi quyết định.__\n"
+        "✨ Thanh toán **__không đảm bảo__** sẽ được cấp quyền dùng lệnh /batch. Việc cấp quyền phụ thuộc vào quyết định và tâm trạng của chúng tôi.\n"
     )
      
     buttons = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("📋 See Plans", callback_data="see_plan")],
-            [InlineKeyboardButton("💬 Contact Now", url="https://t.me/kingofpatal")],
+            [InlineKeyboardButton("📋 Xem gói cao cấp", callback_data="see_plan")],
+            [InlineKeyboardButton("💬 Liên hệ ngay", url="https://t.me/NAME_APEX")],
         ]
     )
     await message.reply_text(terms_text, reply_markup=buttons)
@@ -179,18 +175,18 @@ async def terms(client, message):
  
 @app.on_message(filters.command("plan") & filters.private)
 async def plan(client, message):
-    plan_text = (
-        "> 💰 **Premium Price**:\n\n Starting from $2 or 200 INR accepted via **__Amazon Gift Card__** (terms and conditions apply).\n"
-        "📥 **Download Limit**: Users can download up to 100,000 files in a single batch command.\n"
-        "🛑 **Batch**: You will get two modes /bulk and /batch.\n"
-        "   - Users are advised to wait for the process to automatically cancel before proceeding with any downloads or uploads.\n\n"
-        "📜 **Terms and Conditions**: For further details and complete terms and conditions, please send /terms.\n"
+     plan_text = (
+        "> 💰 **Giá Premium**:\n\n Gói mặc định VIP_1 300.000VND và VIP_2 500.000VND sử dụng trong 30 ngày. Cập nhật thông tin thanh toán vui lòng liên hệ admin **__@Name_Apex__** .\n"
+        "📥 **Giới hạn tải**: VIP_1 20 bài viết + VIP_2 50 bài viết bằng một lệnh /batch tùy chỉnh số lượng tải.\n"
+        "🛑 **Batch**: Có hai chế độ /bulk và /batch.\n"
+        "   - Bạn nên chờ quá trình tự hủy trước khi tiếp tục tải hoặc đăng.\n\n"
+        "📜 **Điều khoản**: Xem chi tiết bằng cách gửi lệnh /terms.\n"
     )
      
     buttons = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("📜 See Terms", callback_data="see_terms")],
-            [InlineKeyboardButton("💬 Contact Now", url="https://t.me/kingofpatal")],
+            [InlineKeyboardButton("📜 Xem Điều Khoản", callback_data="see_terms")],
+            [InlineKeyboardButton("💬 Liên Hệ Ngay", url="https://t.me/Name_Apex")],
         ]
     )
     await message.reply_text(plan_text, reply_markup=buttons)
@@ -199,17 +195,17 @@ async def plan(client, message):
 @app.on_callback_query(filters.regex("see_plan"))
 async def see_plan(client, callback_query):
     plan_text = (
-        "> 💰**Premium Price**\n\n Starting from $2 or 200 INR accepted via **__Amazon Gift Card__** (terms and conditions apply).\n"
-        "📥 **Download Limit**: Users can download up to 100,000 files in a single batch command.\n"
-        "🛑 **Batch**: You will get two modes /bulk and /batch.\n"
-        "   - Users are advised to wait for the process to automatically cancel before proceeding with any downloads or uploads.\n\n"
-        "📜 **Terms and Conditions**: For further details and complete terms and conditions, please send /terms or click See Terms👇\n"
+        "> 💰**Giá Premium**:\n\n Gói mặc định VIP_1 300.000VND và VIP_2 500.000VND sử dụng trong 30 ngày. Cập nhật thông tin thanh toán vui lòng liên hệ admin **__@Name_Apex__** .\n"
+        "📥 **Giới hạn tải**: VIP_1 20 bài viết + VIP_2 50 bài viết bằng một lệnh /batch tùy chỉnh số lượng tải.\n"
+        "🛑 **Batch**: Có hai chế độ /bulk và /batch.\n"
+        "   - Bạn nên chờ quá trình tự hủy trước khi tiếp tục tải hoặc đăng.\n\n"
+        "📜 **Điều khoản**: Xem chi tiết bằng cách gửi lệnh /terms 👇.\n"
     )
      
     buttons = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("📜 See Terms", callback_data="see_terms")],
-            [InlineKeyboardButton("💬 Contact Now", url="https://t.me/kingofpatal")],
+            [InlineKeyboardButton("📜 Xem Điều Khoản", callback_data="see_terms")],
+            [InlineKeyboardButton("💬 Liên Hệ Ngay", url="https://t.me/Name_Apex")],
         ]
     )
     await callback_query.message.edit_text(plan_text, reply_markup=buttons)
@@ -218,16 +214,16 @@ async def see_plan(client, callback_query):
 @app.on_callback_query(filters.regex("see_terms"))
 async def see_terms(client, callback_query):
     terms_text = (
-        "> 📜 **Terms and Conditions** 📜\n\n"
-        "✨ We are not responsible for user deeds, and we do not promote copyrighted content. If any user engages in such activities, it is solely their responsibility.\n"
-        "✨ Upon purchase, we do not guarantee the uptime, downtime, or the validity of the plan. __Authorization and banning of users are at our discretion; we reserve the right to ban or authorize users at any time.__\n"
-        "✨ Payment to us **__does not guarantee__** authorization for the /batch command. All decisions regarding authorization are made at our discretion and mood.\n"
+          "> 📜 **Điều khoản và điều kiện** 📜\n\n"
+        "✨ Chúng tôi không chịu trách nhiệm cho hành vi người dùng và không khuyến khích nội dung vi phạm bản quyền. Người dùng chịu trách nhiệm hoàn toàn.\n"
+        "✨ Khi mua, chúng tôi không đảm bảo thời gian hoạt động hoặc hiệu lực gói. __Việc cấp quyền hay chặn người dùng hoàn toàn do chúng tôi quyết định.__\n"
+        "✨ Thanh toán **__không đảm bảo__** sẽ được cấp quyền dùng lệnh /batch. Việc cấp quyền phụ thuộc vào quyết định và tâm trạng của chúng tôi.\n"
     )
      
     buttons = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("📋 See Plans", callback_data="see_plan")],
-            [InlineKeyboardButton("💬 Contact Now", url="https://t.me/kingofpatal")],
+            [InlineKeyboardButton("📋 Xem Điều Khoản", callback_data="see_plan")],
+            [InlineKeyboardButton("💬 Liên Hệ Ngay", url="https://t.me/Name_Apex")],
         ]
     )
     await callback_query.message.edit_text(terms_text, reply_markup=buttons)
