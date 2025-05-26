@@ -49,10 +49,13 @@ async def set(_, message):
         BotCommand("help", "❓ Hướng dẫn sử dụng"),
         BotCommand("cancel", "🚫 Hủy quá trình đăng nhập/batch/cài đặt"),
         BotCommand("stop", "🚫 Hủy quá trình batch")
- 
+    ])
+    
     await message.reply("✅ Cài Đặt Lệnh Thành Công!")
- 
-# Danh sách trang hướng dẫn sử dụng bot
+
+
+    
+help_pages = [
     (
         "📝 **Tổng quan lệnh bot (1/2)**:\n\n"
         "1. **/add userID**\n"
