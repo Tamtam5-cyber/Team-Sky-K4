@@ -13,21 +13,21 @@ async def subscribe(app, message):
         try:
           user = await app.get_chat_member(FORCE_SUB, message.from_user.id)
           if str(user.status) == "ChatMemberStatus.BANNED":
-              await message.reply_text("Bạn đã bị chặn. Vui lòng liên hệ Team SKY")
+              await message.reply_text("You are Banned. Contact -- Team SKY")
               return 1
         except UserNotParticipant:
             link = await app.export_chat_invite_link(FORCE_SUB)
-            caption = f"Vui lòng tham gia kênh của chúng tôi để sử dụng bot."
-            await message.reply_photo(photo="https://graph.org/file/d44f024a08ded19452152.jpg",caption=caption, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Tham gia ngay...", url=f"{link}")]]))
+            caption = f"Tham gia kênh của chúng tôi để sử dụng bot"
+            await message.reply_photo(photo="https://graph.org/file/d44f024a08ded19452152.jpg",caption=caption, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Now...", url=f"{link}")]]))
             return 1
         except Exception as ggn:
-            await message.reply_text(f"Đã xảy ra lỗi. Vui lòng liên hệ quản trị viên !!!{ggn}")
+            await message.reply_text(f"Có gì đó không ổn. Liên hệ với quản trị viên... với thông báo sau {ggn}")
             return 1 
      
 @app.on_message(filters.command("set"))
 async def set(_, message):
     if message.from_user.id not in OWNER_ID:
-        await message.reply("Bạn không có quyền sử dụng lệnh này.")
+        await message.reply("Bạn không được phép sử dụng lệnh này.")
         return
      
     await app.set_bot_commands([
